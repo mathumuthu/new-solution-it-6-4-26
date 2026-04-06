@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Codeio | Let's Talk</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        dark: { 900: '#050505', 800: '#0a0a0a', 700: '#121212', card: '#161616' },
+                        brand: { blue: '#2563eb', purple: '#7c3aed', accent: '#3b82f6' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #7c3aed);
+            border-radius: 3px;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed, #3b82f6);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            filter: blur(8px);
+        }
+
+        .magnetic-btn:hover::before { opacity: 0.6; }
+
+        /* Form Input Animation */
+        .form-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.25rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-label {
+            position: absolute;
+            left: 1.5rem;
+            top: 1.25rem;
+            color: #9ca3af;
+            pointer-events: none;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .form-input:focus ~ .form-label,
+        .form-input:not(:placeholder-shown) ~ .form-label {
+            top: -0.75rem;
+            left: 1rem;
+            font-size: 0.875rem;
+            color: #3b82f6;
+            background: #0a0a0a;
+            padding: 0 0.5rem;
+        }
+
+        .form-line {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #7c3aed);
+            transition: all 0.4s;
+            transform: translateX(-50%);
+        }
+
+        .form-input:focus ~ .form-line {
+            width: 100%;
+        }
+
+        /* Contact Method Card */
+        .contact-method {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .contact-method::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(59, 130, 246, 0.15) 0%, 
+                transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .contact-method:hover::before { opacity: 1; }
+
+        .contact-method:hover .contact-icon {
+            transform: rotateY(360deg) scale(1.1);
+        }
+
+        .contact-icon {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Map Container */
+        .map-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+        }
+
+        .map-container iframe {
+            filter: grayscale(100%) invert(92%) contrast(83%);
+            transition: filter 0.4s;
+        }
+
+        .map-container:hover iframe {
+            filter: grayscale(0%) invert(0%) contrast(100%);
+        }
+
+        .map-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(124,58,237,0.1));
+            pointer-events: none;
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .faq-item.open .faq-content { max-height: 500px; }
+
+        .faq-icon { transition: transform 0.3s; }
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating { animation: float 6s ease-in-out infinite; }
+
+        /* Pulse Glow */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+        }
+
+        .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+        /* Shimmer */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s, width 0.3s, height 0.3s;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor.hover {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: #050505;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-circle {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Navigation Link Hover */
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #7c3aed);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .nav-link:hover::after { transform: translateX(0); }
+
+        /* Submit Button Animation */
+        .submit-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .submit-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Success Message */
+        .success-message {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Social Links */
+        .social-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: inherit;
+        }
+
+        .social-link:hover::before { opacity: 1; }
+        .social-link:hover { color: white; }
+
+        /* Office Card */
+        .office-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .office-card .office-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.4s, transform 0.4s;
+            transform: scale(1.1);
+        }
+
+        .office-card:hover .office-bg {
+            opacity: 0.2;
+            transform: scale(1);
+        }
+
+        /* MOBILE MENU STYLES - ADDED */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9998;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu a {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 1rem 0;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.active a {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .mobile-menu a:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu a:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-menu a:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-menu a:nth-child(4) { transition-delay: 0.25s; }
+        .mobile-menu a:nth-child(5) { transition-delay: 0.3s; }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        /* Prevent body scroll when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+
+    <!-- MOBILE MENU - ADDED -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-close" id="mobile-menu-close">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </div>
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About Us</a>
+        <a href="service.html" class="nav-link">Services</a>
+        <a href="project.html" class="nav-link">Projects</a>
+        <a href="contact.html" class="nav-link text-blue-400">Contact</a>
+        <a href="login.html" class="magnetic-btn bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium mt-8 shadow-lg shadow-blue-600/30">
+            Login
+        </a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-500" id="navbar">
+        <div class="absolute inset-0 glass-panel border-b-0"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+                    <!-- 🔥 NEW LOGO -->
+                    <div class="w-10 h-10 rounded-xl overflow-hidden">
+                        <img src="logo.webp" alt="logo" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Stackly</span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Home</a>
+                    <a href="about.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">About Us</a>
+                    <a href="service.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Services</a>
+                    <a href="project.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Projects</a>
+                    <a href="contact.html" class="nav-link text-white transition-colors text-sm font-medium py-2">Contact</a>
+                </div>
+
+                <div class="hidden md:flex items-center">
+                    <a href="login.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 group">
+                        Login
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                    </a>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none z-50 relative">
+                        <i data-lucide="menu" class="w-8 h-8"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px] animate-pulse"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] animate-pulse" style="animation-delay: 1s;"></div>
+        </div>
+
+        <!-- Floating Elements -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="floating absolute top-32 left-10 w-24 h-24 border border-blue-500/20 rounded-2xl rotate-12 hidden lg:block"></div>
+            <div class="floating absolute bottom-40 right-20 w-32 h-32 border border-purple-500/20 rounded-full hidden lg:block" style="animation-delay: 2s; animation-duration: 8s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 reveal-badge">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wider uppercase text-gray-300">Get In Touch</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
+                <span class="text-gradient block reveal-text">Let's Start</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 block reveal-text" style="animation-delay: 0.2s;">A Conversation</span>
+            </h1>
+
+            <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-400 mb-12 reveal-paragraph">
+                Have a project in mind or just want to say hello? We'd love to hear from you. Reach out and let's create something amazing together.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-8 reveal-item">
+                <div class="flex items-center gap-3 text-gray-300">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <i data-lucide="clock" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <span class="text-sm">Response time: <span class="text-white font-medium">24h</span></span>
+                </div>
+                <div class="flex items-center gap-3 text-gray-300">
+                    <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                        <i data-lucide="users" class="w-5 h-5 text-purple-400"></i>
+                    </div>
+                    <span class="text-sm">Support team: <span class="text-white font-medium">24/7</span></span>
+                </div>
+                <div class="flex items-center gap-3 text-gray-300">
+                    <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <i data-lucide="globe" class="w-5 h-5 text-green-400"></i>
+                    </div>
+                    <span class="text-sm">Global offices: <span class="text-white font-medium">8 locations</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Methods -->
+    <section class="py-20 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Email -->
+                <div class="contact-method glass-card p-8 rounded-3xl text-center group reveal-card tilt-card">
+                    <div class="contact-icon w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-600/5 flex items-center justify-center border border-blue-500/30">
+                        <i data-lucide="mail" class="w-10 h-10 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Email Us</h3>
+                    <p class="text-gray-400 text-sm mb-4">For general inquiries and project discussions</p>
+                    <a href="mailto:hello@codeio.tech" class="text-blue-400 hover:text-blue-300 transition-colors font-medium">hello@codeio.tech</a>
+                </div>
+
+                <!-- Phone -->
+                <div class="contact-method glass-card p-8 rounded-3xl text-center group reveal-card tilt-card" style="transition-delay: 0.1s;">
+                    <div class="contact-icon w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600/20 to-purple-600/5 flex items-center justify-center border border-purple-500/30">
+                        <i data-lucide="phone" class="w-10 h-10 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Call Us</h3>
+                    <p class="text-gray-400 text-sm mb-4">Mon-Fri from 8am to 6pm GMT</p>
+                    <a href="tel:+442071234567" class="text-purple-400 hover:text-purple-300 transition-colors font-medium">+44 (0) 20 7123 4567</a>
+                </div>
+
+                <!-- Visit -->
+                <div class="contact-method glass-card p-8 rounded-3xl text-center group reveal-card tilt-card" style="transition-delay: 0.2s;">
+                    <div class="contact-icon w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-pink-600/20 to-pink-600/5 flex items-center justify-center border border-pink-500/30">
+                        <i data-lucide="map-pin" class="w-10 h-10 text-pink-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Visit Us</h3>
+                    <p class="text-gray-400 text-sm mb-4">123 Tech Street, London EC1A 1BB</p>
+                    <a href="404.html" class="text-pink-400 hover:text-pink-300 transition-colors font-medium">View on Map</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Contact Section -->
+    <section id="contact" class="py-32 relative overflow-hidden bg-dark-800/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- Contact Form -->
+                <div class="reveal-item">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        SEND A MESSAGE
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">Tell Us About Your Project</h2>
+                    <p class="text-gray-400 mb-10">Fill out the form below and we'll get back to you within 24 hours with a detailed proposal.</p>
+
+                    <form id="contact-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <input type="text" class="form-input" placeholder=" " required>
+                                <label class="form-label">Your Name</label>
+                                <div class="form-line"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-input" placeholder=" " required>
+                                <label class="form-label">Email Address</label>
+                                <div class="form-line"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <input type="text" class="form-input" placeholder=" ">
+                                <label class="form-label">Company Name</label>
+                                <div class="form-line"></div>
+                            </div>
+                            <div class="form-group">
+                                <select class="form-input appearance-none cursor-pointer" required>
+                                    <option value="" disabled selected>Select Budget Range</option>
+                                    <option value="10k-25k">$10,000 - $25,000</option>
+                                    <option value="25k-50k">$25,000 - $50,000</option>
+                                    <option value="50k-100k">$50,000 - $100,000</option>
+                                    <option value="100k+">$100,000+</option>
+                                </select>
+                                <div class="form-line"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <select class="form-input appearance-none cursor-pointer" required>
+                                <option value="" disabled selected>Project Type</option>
+                                <option value="web">Web Development</option>
+                                <option value="app">Mobile App</option>
+                                <option value="cloud">Cloud Solutions</option>
+                                <option value="security">Cybersecurity</option>
+                                <option value="ai">AI & Data Analytics</option>
+                                <option value="consulting">IT Consulting</option>
+                            </select>
+                            <div class="form-line"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea class="form-input min-h-[150px] resize-none" placeholder=" " required></textarea>
+                            <label class="form-label">Tell us about your project...</label>
+                            <div class="form-line"></div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" id="privacy" class="mt-1 w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-blue-500" required>
+                            <label for="privacy" class="text-sm text-gray-400">
+                                I agree to the <a href="#" class="text-blue-400 hover:underline">Privacy Policy</a> and processing of my personal data.
+                            </label>
+                        </div>
+
+                        <button type="submit" class="submit-btn magnetic-btn w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 rounded-full font-medium text-lg transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 group">
+                            <span>Send Message</span>
+                            <i data-lucide="send" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+
+                        <!-- Success Message -->
+                        <div class="success-message glass-card p-6 rounded-2xl text-center border-green-500/30" id="success-message">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-8 h-8 text-green-400"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">Message Sent!</h3>
+                            <p class="text-gray-400">Thank you for reaching out. We'll get back to you within 24 hours.</p>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Info Side -->
+                <div class="space-y-8 reveal-item">
+                    <!-- Quick Response Card -->
+                    <div class="glass-card p-8 rounded-3xl shimmer">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center flex-shrink-0 pulse-glow">
+                                <i data-lucide="zap" class="w-7 h-7 text-blue-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">Quick Response Guarantee</h3>
+                                <p class="text-gray-400 leading-relaxed">We understand that time is critical. That's why we guarantee a response to all inquiries within 24 hours during business days.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- What Happens Next -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <h3 class="text-xl font-semibold mb-6">What Happens Next?</h3>
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0 text-blue-400 font-bold text-sm">1</div>
+                                <div>
+                                    <h4 class="font-medium mb-1">Initial Review</h4>
+                                    <p class="text-gray-400 text-sm">Our team reviews your requirements within 24 hours</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0 text-purple-400 font-bold text-sm">2</div>
+                                <div>
+                                    <h4 class="font-medium mb-1">Discovery Call</h4>
+                                    <p class="text-gray-400 text-sm">We schedule a call to discuss your project in detail</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0 text-pink-400 font-bold text-sm">3</div>
+                                <div>
+                                    <h4 class="font-medium mb-1">Proposal</h4>
+                                    <p class="text-gray-400 text-sm">You receive a detailed proposal with timeline and cost</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <h3 class="text-xl font-semibold mb-6">Follow Us</h3>
+                        <div class="flex gap-4">
+                            <a href="404.html" class="social-link w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/10">
+<i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="404.html" class="social-link w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/10">
+<i class="fab fa-linkedin text-xl"></i>
+                            </a>
+                            <a href="404.html" class="social-link w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/10">
+<i class="fab fa-github text-xl"></i>
+                            </a>
+                            <a href="404.html" class="social-link w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/10">
+<i class="fab fa-instagram text-xl"></i>
+                            </a>
+                            <a href="404.html" class="social-link w-14 h-14 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/10">
+<i class="fab fa-dribbble text-xl"></i>                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section id="map" class="py-20 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 reveal-item">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    FIND US
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Visit Our Headquarters</h2>
+            </div>
+
+            <div class="map-container h-[500px] reveal-item">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2482.875712060757!2d-0.0823!3d51.5155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761b34d3c1c4b1%3A0x4f0f0f0f0f0f0f0f!2sLondon%20EC1A%2C%20UK!5e0!3m2!1sen!2sus!4v1234567890"
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+                <div class="map-overlay"></div>
+                
+                <!-- Map Card Overlay -->
+                <div class="absolute bottom-8 left-8 glass-card p-6 rounded-2xl max-w-sm hidden md:block">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="building-2" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Codeio HQ</h4>
+                            <p class="text-gray-400 text-sm">123 Tech Street<br>London EC1A 1BB, UK</p>
+                            <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 mt-3 text-blue-400 text-sm hover:text-blue-300 transition-colors">
+                                Get Directions <i data-lucide="external-link" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Offices -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal-item">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Our Global Offices</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">With teams across 8 countries, we're always within reach to support your business needs.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- London -->
+                <div class="office-card glass-card p-6 rounded-3xl relative overflow-hidden group cursor-pointer reveal-card tilt-card">
+                    <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=400" alt="London" class="office-bg w-full h-full object-cover">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4 border border-blue-500/30">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1">London</h3>
+                        <p class="text-gray-400 text-sm mb-3">United Kingdom</p>
+                        <p class="text-gray-500 text-xs">123 Tech Street, EC1A 1BB</p>
+                    </div>
+                </div>
+
+                <!-- New York -->
+                <div class="office-card glass-card p-6 rounded-3xl relative overflow-hidden group cursor-pointer reveal-card tilt-card" style="transition-delay: 0.1s;">
+                    <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=400" alt="New York" class="office-bg w-full h-full object-cover">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4 border border-purple-500/30">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-purple-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1">New York</h3>
+                        <p class="text-gray-400 text-sm mb-3">United States</p>
+                        <p class="text-gray-500 text-xs">350 Fifth Avenue, NY 10118</p>
+                    </div>
+                </div>
+
+                <!-- Singapore -->
+                <div class="office-card glass-card p-6 rounded-3xl relative overflow-hidden group cursor-pointer reveal-card tilt-card" style="transition-delay: 0.2s;">
+                    <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=400" alt="Singapore" class="office-bg w-full h-full object-cover">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center mb-4 border border-pink-500/30">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-pink-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1">Singapore</h3>
+                        <p class="text-gray-400 text-sm mb-3">Asia Pacific</p>
+                        <p class="text-gray-500 text-xs">1 Raffles Place, 048616</p>
+                    </div>
+                </div>
+
+                <!-- Berlin -->
+                <div class="office-card glass-card p-6 rounded-3xl relative overflow-hidden group cursor-pointer reveal-card tilt-card" style="transition-delay: 0.3s;">
+                    <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&q=80&w=400" alt="Berlin" class="office-bg w-full h-full object-cover">
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4 border border-green-500/30">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-green-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1">Berlin</h3>
+                        <p class="text-gray-400 text-sm mb-3">Germany</p>
+                        <p class="text-gray-500 text-xs">Alexanderplatz 1, 10178</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-32 relative overflow-hidden bg-dark-800/30">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal-item">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    FAQ
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Common Questions</h2>
+            </div>
+
+            <div class="space-y-4 reveal-item">
+                <div class="faq-item glass-card rounded-2xl overflow-hidden">
+                    <button class="faq-header w-full p-6 flex justify-between items-center text-left" onclick="toggleFaq(this)">
+                        <span class="font-semibold text-lg">How quickly will you respond to my inquiry?</span>
+                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            We guarantee a response within 24 hours during business days (Monday-Friday). For urgent matters, we recommend calling our support line directly for immediate assistance.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item glass-card rounded-2xl overflow-hidden">
+                    <button class="faq-header w-full p-6 flex justify-between items-center text-left" onclick="toggleFaq(this)">
+                        <span class="font-semibold text-lg">What information should I include in my project inquiry?</span>
+                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            The more details you provide, the better we can understand your needs. Include your project goals, timeline, budget range, and any specific technologies or requirements you have in mind.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item glass-card rounded-2xl overflow-hidden">
+                    <button class="faq-header w-full p-6 flex justify-between items-center text-left" onclick="toggleFaq(this)">
+                        <span class="font-semibold text-lg">Do you offer free consultations?</span>
+                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            Yes! We offer a complimentary 30-minute discovery call to discuss your project requirements, answer questions, and explore how we can help. No obligation required.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item glass-card rounded-2xl overflow-hidden">
+                    <button class="faq-header w-full p-6 flex justify-between items-center text-left" onclick="toggleFaq(this)">
+                        <span class="font-semibold text-lg">Can I visit your office for a meeting?</span>
+                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            Absolutely! We welcome in-person meetings at any of our global offices. Please schedule an appointment in advance so we can ensure the right team members are available to meet you.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+   <footer class="pt-20 pb-10 border-t border-white/5 bg-dark-900 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10 mb-16 group cursor-pointer">
+                <h2 class="text-6xl md:text-8xl font-bold tracking-tighter text-gray-500 group-hover:text-white transition-colors duration-500">LET'S CONNECT</h2>
+                <div class="w-20 h-20 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all magnetic-btn">
+                    <i data-lucide="arrow-up-right" class="w-8 h-8 group-hover:text-white"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 py-12 border-t border-white/10">
+                <div>
+                    <h4 class="font-semibold mb-6">Codeio</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Empowering businesses through innovative IT solutions and digital transformation since 2015.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-6">Company</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                                                <li><a href="index.html" class="hover:text-white transition-colors">Home</a></li>
+
+                        <li><a href="about.html" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="service.html" class="hover:text-white transition-colors">Service</a></li>
+                        <li><a href="project.html" class="hover:text-white transition-colors">Project</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-6">Services</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="404.html" class="hover:text-white transition-colors">Software Development</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">Cloud Solutions</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">Cybersecurity</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">IT Consulting</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-6">Connect</h4>
+                    <div class="flex gap-4 mb-6">
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+<i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+<i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">hello@codeio.tech</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-sm text-gray-500">
+                <p>&copy; 2024 Codeio. All rights reserved.</p>
+                <div class="flex gap-8 mt-4 md:mt-0">
+                    <a href="404.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="404.html" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="404.html" class="hover:text-white transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons - MOVED TO DOMContentLoaded
+        function initLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Register GSAP ScrollTrigger
+        if (typeof gsap !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+        }
+
+        // Hide Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 500);
+        });
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons immediately
+            initLucideIcons();
+            
+            // Mobile Menu Toggle Functionality - ADDED
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+            const body = document.body;
+
+            function openMobileMenu() {
+                mobileMenu.classList.add('active');
+                body.classList.add('menu-open');
+                // Re-initialize icons for mobile menu
+                setTimeout(initLucideIcons, 100);
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                body.classList.remove('menu-open');
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', openMobileMenu);
+            }
+
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', closeMobileMenu);
+            }
+
+            // Close menu when clicking on links
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            // Custom Cursor
+            const cursor = document.getElementById('cursor');
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+
+            // Only enable custom cursor on non-touch devices
+            if (!window.matchMedia('(pointer: coarse)').matches && cursor) {
+                document.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+
+                function animateCursor() {
+                    cursorX += (mouseX - cursorX) * 0.1;
+                    cursorY += (mouseY - cursorY) * 0.1;
+                    cursor.style.left = cursorX - 10 + 'px';
+                    cursor.style.top = cursorY - 10 + 'px';
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+
+                // Cursor hover effects
+                document.querySelectorAll('a, button, .magnetic-btn, .contact-method, .tilt-card').forEach(el => {
+                    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+                });
+            } else if (cursor) {
+                cursor.style.display = 'none';
+            }
+
+            // Magnetic Button Effect
+            document.querySelectorAll('.magnetic-btn').forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+
+            // Contact Method Spotlight Effect
+            document.querySelectorAll('.contact-method').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--mouse-x', `${x}%`);
+                    card.style.setProperty('--mouse-y', `${y}%`);
+                });
+            });
+
+            // 3D Tilt Effect
+            document.querySelectorAll('.tilt-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 20;
+                    const rotateY = (centerX - x) / 20;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                });
+            });
+
+            // Form Submission
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    
+                    btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Sending...';
+                    initLucideIcons();
+                    btn.disabled = true;
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        initLucideIcons();
+                        
+                        document.getElementById('success-message').classList.add('show');
+                        this.reset();
+                        
+                        setTimeout(() => {
+                            document.getElementById('success-message').classList.remove('show');
+                        }, 5000);
+                    }, 2000);
+                });
+            }
+
+            // GSAP Animations
+            if (typeof gsap !== 'undefined') {
+                gsap.from(".reveal-badge", {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.8,
+                    delay: 0.3,
+                    ease: "power3.out"
+                });
+
+                gsap.from(".reveal-text", {
+                    y: 100,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: "power4.out",
+                    delay: 0.5
+                });
+
+                gsap.from(".reveal-paragraph", {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.8,
+                    delay: 0.9,
+                    ease: "power3.out"
+                });
+
+                gsap.from(".reveal-item", {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.8,
+                    delay: 1.1,
+                    ease: "power3.out",
+                    stagger: 0.1
+                });
+
+                // Scroll Reveal
+                gsap.utils.toArray('.reveal-card').forEach((element, i) => {
+                    gsap.from(element, {
+                        scrollTrigger: {
+                            trigger: element,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        },
+                        y: 60,
+                        opacity: 0,
+                        scale: 0.9,
+                        duration: 0.8,
+                        ease: "back.out(1.7)",
+                        delay: i * 0.1
+                    });
+                });
+            }
+
+            // Navbar Scroll Effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shadow-lg');
+                    navbar.querySelector('.glass-panel').style.background = 'rgba(0,0,0,0.8)';
+                } else {
+                    navbar.classList.remove('shadow-lg');
+                    navbar.querySelector('.glass-panel').style.background = 'rgba(255,255,255,0.03)';
+                }
+            });
+
+            // Smooth Scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+
+        // FAQ Toggle
+        function toggleFaq(button) {
+            const item = button.parentElement;
+            const isOpen = item.classList.contains('open');
+            
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+            
+            if (!isOpen) {
+                item.classList.add('open');
+            }
+        }
+    </script>
+</body>
+</html>

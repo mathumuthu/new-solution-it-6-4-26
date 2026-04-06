@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - Codeio | IT Solutions</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        dark: { 900: '#050505', 800: '#0a0a0a', 700: '#121212', card: '#161616' },
+                        brand: { blue: '#2563eb', purple: '#7c3aed', accent: '#3b82f6' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #7c3aed);
+            border-radius: 3px;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed, #3b82f6);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            filter: blur(8px);
+        }
+
+        .magnetic-btn:hover::before { opacity: 0.6; }
+
+        /* Service Card Hover Effects */
+        .service-card {
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(59, 130, 246, 0.15) 0%, 
+                transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .service-card:hover::before { opacity: 1; }
+
+        .service-icon {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card:hover .service-icon {
+            transform: rotateY(360deg) scale(1.1);
+        }
+
+        /* Pricing Toggle */
+        .pricing-toggle {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 9999px;
+            padding: 4px;
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .pricing-toggle-btn {
+            position: relative;
+            z-index: 1;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .pricing-toggle-btn.active {
+            color: white;
+        }
+
+        .pricing-toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            border-radius: 9999px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Price Card */
+        .price-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            color: white;
+            padding: 8px 40px;
+            font-size: 12px;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+
+        .price-card.popular {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Feature Check Animation */
+        .feature-check {
+            stroke-dasharray: 20;
+            stroke-dashoffset: 20;
+            transition: stroke-dashoffset 0.5s;
+        }
+
+        .price-card:hover .feature-check {
+            stroke-dashoffset: 0;
+        }
+
+        /* Process Step */
+        .process-step {
+            position: relative;
+        }
+
+        .process-step::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+            transform: translateY(-50%);
+        }
+
+        .process-step:last-child::before { display: none; }
+
+        @media (max-width: 768px) {
+            .process-step::before {
+                top: 100%;
+                left: 50%;
+                width: 2px;
+                height: 60px;
+                background: linear-gradient(180deg, #3b82f6, transparent);
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating { animation: float 6s ease-in-out infinite; }
+
+        /* Glow Pulse */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+        }
+
+        .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+        /* Shimmer */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Tab Animation */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 500px;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Stats Counter */
+        .stat-number { font-variant-numeric: tabular-nums; }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s, width 0.3s, height 0.3s;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor.hover {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: #050505;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-circle {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Navigation Link Hover */
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #7c3aed);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .nav-link:hover::after { transform: translateX(0); }
+
+        /* Service Detail Reveal */
+        .service-detail {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card.expanded .service-detail {
+            max-height: 400px;
+            opacity: 1;
+            margin-top: 1.5rem;
+        }
+
+        .service-card.expanded {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .service-card.expanded { grid-column: span 1; }
+        }
+
+        /* ============================================
+           MOBILE MENU STYLES - ADDED
+           ============================================ */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 9998;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .mobile-menu-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu a {
+            font-size: 2rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .mobile-menu a:hover {
+            color: #3b82f6;
+        }
+
+        .mobile-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0.5rem;
+            left: 2rem;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #7c3aed);
+            transition: width 0.3s;
+        }
+
+        .mobile-menu a:hover::after {
+            width: calc(100% - 4rem);
+        }
+
+        /* Prevent body scroll when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        /* Mobile menu overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9997;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+
+    <!-- ============================================
+         MOBILE MENU HTML - ADDED
+         ============================================ -->
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </div>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="service.html">Services</a>
+        <a href="project.html">Project</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="mt-8 bg-blue-600 px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors">Login</a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-500" id="navbar">
+        <div class="absolute inset-0 glass-panel border-b-0"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+                    <!--  NEW LOGO -->
+                    <div class="w-10 h-10 rounded-xl overflow-hidden">
+                        <img src="logo.webp" alt="logo" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Stackly</span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Home</a>
+                    <a href="about.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">About Us</a>
+                    <a href="service.html" class="nav-link text-white transition-colors text-sm font-medium py-2">Services</a>
+                    <a href="project.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Project</a>
+                    <a href="contact.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Contact</a>
+                </div>
+
+                <div class="hidden md:flex items-center">
+                    <a href="login.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 group">
+                        Login
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                    </a>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none p-2" aria-label="Open menu">
+                        <i data-lucide="menu" class="w-8 h-8"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-20">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px] animate-pulse"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] animate-pulse" style="animation-delay: 1s;"></div>
+        </div>
+
+        <!-- Floating Elements -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="floating absolute top-32 left-10 w-24 h-24 border border-blue-500/30 rounded-2xl rotate-12 hidden lg:block"></div>
+            <div class="floating absolute bottom-40 right-20 w-32 h-32 border border-purple-500/30 rounded-full hidden lg:block" style="animation-delay: 2s; animation-duration: 8s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 reveal-badge">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wider uppercase text-gray-300">Our Services</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
+                <span class="text-gradient block reveal-text">Solutions That</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 block reveal-text" style="animation-delay: 0.2s;">Drive Growth</span>
+            </h1>
+
+            <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-400 mb-12 reveal-paragraph">
+                From cloud infrastructure to cybersecurity, we deliver comprehensive IT services tailored to transform your business operations.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center reveal-buttons">
+                <a href="404.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 rounded-full font-medium transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 group">
+                    Explore Services
+                    <i data-lucide="arrow-down" class="w-5 h-5 group-hover:translate-y-1 transition-transform"></i>
+                </a>
+                <a href="404.html" class="magnetic-btn glass-panel hover:bg-white/10 text-white text-lg px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 group border border-white/10">
+                    View Pricing
+                    <i data-lucide="tag" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Grid Section -->
+    <section id="services" class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    WHAT WE OFFER
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 reveal-item">Comprehensive IT Solutions</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto reveal-item">End-to-end technology services designed to scale with your business needs</p>
+            </div>
+
+            <!-- Service Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="services-grid">
+                <!-- Service 1: Software Development -->
+                <div class="service-card glass-card p-8 rounded-3xl cursor-pointer group reveal-card" data-service="dev">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="service-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-600/5 flex items-center justify-center border border-blue-500/30">
+                            <i data-lucide="code-2" class="w-8 h-8 text-blue-400"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-blue-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Software Development</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">Custom web and mobile applications built with cutting-edge technologies. From concept to deployment.</p>
+                    
+                    <div class="service-detail">
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-400"></i> Full-stack Development</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-400"></i> Mobile Apps (iOS/Android)</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-400"></i> API Integration</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-400"></i> Legacy System Modernization</li>
+                        </ul>
+                        <a href="404.html" class="inline-flex items-center gap-2 mt-4 text-blue-400 text-sm font-medium hover:text-blue-300 transition-colors">
+                            Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 2: Cloud Solutions -->
+                <div class="service-card glass-card p-8 rounded-3xl cursor-pointer group reveal-card" data-service="cloud" style="transition-delay: 0.1s;">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="service-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-purple-600/5 flex items-center justify-center border border-purple-500/30">
+                            <i data-lucide="cloud" class="w-8 h-8 text-purple-400"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-purple-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Cloud Solutions</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">Scalable cloud infrastructure and migration services. AWS, Azure, and Google Cloud expertise.</p>
+                    
+                    <div class="service-detail">
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Cloud Migration</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Infrastructure as Code</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Serverless Architecture</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Cost Optimization</li>
+                        </ul>
+                        <a href="404.html" class="inline-flex items-center gap-2 mt-4 text-purple-400 text-sm font-medium hover:text-purple-300 transition-colors">
+                            Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 3: Cybersecurity -->
+                <div class="service-card glass-card p-8 rounded-3xl cursor-pointer group reveal-card" data-service="security" style="transition-delay: 0.2s;">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="service-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600/20 to-red-600/5 flex items-center justify-center border border-red-500/30">
+                            <i data-lucide="shield-check" class="w-8 h-8 text-red-400"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-red-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Cybersecurity</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">Enterprise-grade security solutions to protect your data and infrastructure from threats.</p>
+                    
+                    <div class="service-detail">
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-red-400"></i> Penetration Testing</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-red-400"></i> Security Audits</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-red-400"></i> Incident Response</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-red-400"></i> Compliance Management</li>
+                        </ul>
+                        <a href="404.html" class="inline-flex items-center gap-2 mt-4 text-red-400 text-sm font-medium hover:text-red-300 transition-colors">
+                            Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 4: Data Analytics -->
+                <div class="service-card glass-card p-8 rounded-3xl cursor-pointer group reveal-card" data-service="data" style="transition-delay: 0.3s;">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="service-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-green-600/20 to-green-600/5 flex items-center justify-center border border-green-500/30">
+                            <i data-lucide="bar-chart-3" class="w-8 h-8 text-green-400"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-green-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Data Analytics</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">Transform raw data into actionable insights with AI-powered analytics and visualization.</p>
+                    
+                    <div class="service-detail">
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Business Intelligence</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Predictive Analytics</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Data Visualization</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Machine Learning</li>
+                        </ul>
+                        <a href="404.html" class="inline-flex items-center gap-2 mt-4 text-green-400 text-sm font-medium hover:text-green-300 transition-colors">
+                            Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 5: IT Consulting -->
+                <div class="service-card glass-card p-8 rounded-3xl cursor-pointer group reveal-card" data-service="consulting" style="transition-delay: 0.4s;">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="service-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-600/20 to-yellow-600/5 flex items-center justify-center border border-yellow-500/30">
+                            <i data-lucide="lightbulb" class="w-8 h-8 text-yellow-400"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-yellow-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">IT Consulting</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">Strategic technology consulting to align your IT infrastructure with business objectives.</p>
+                    
+                    <div class="service-detail">
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-yellow-400"></i> Digital Transformation</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-yellow-400"></i> Technology Roadmapping</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-yellow-400"></i> Process Optimization</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-yellow-400"></i> Vendor Selection</li>
+                        </ul>
+                        <a href="404.html" class="inline-flex items-center gap-2 mt-4 text-yellow-400 text-sm font-medium hover:text-yellow-300 transition-colors">
+                            Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Service 6: Managed IT -->
+                <div class="service-card glass-card p-8 rounded-3xl cursor-pointer group reveal-card" data-service="managed" style="transition-delay: 0.5s;">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="service-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600/20 to-pink-600/5 flex items-center justify-center border border-pink-500/30">
+                            <i data-lucide="headphones" class="w-8 h-8 text-pink-400"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-pink-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Managed IT Services</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">24/7 monitoring and support to keep your systems running at peak performance.</p>
+                    
+                    <div class="service-detail">
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-400"></i> 24/7 Monitoring</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-400"></i> Help Desk Support</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-400"></i> Backup & Recovery</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-400"></i> Network Management</li>
+                        </ul>
+                        <a href="404.html" class="inline-flex items-center gap-2 mt-4 text-pink-400 text-sm font-medium hover:text-pink-300 transition-colors">
+                            Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="py-32 relative overflow-hidden bg-dark-800/30">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0); background-size: 40px 40px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    OUR PROCESS
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 reveal-item">How We Deliver Excellence</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Step 1 -->
+                <div class="process-step text-center reveal-card">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-600/20 to-blue-600/5 border border-blue-500/30 flex items-center justify-center relative pulse-glow">
+                        <span class="text-2xl font-bold text-blue-400">01</span>
+                        <div class="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="search" class="w-3 h-3 text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Discovery</h3>
+                    <p class="text-gray-400 text-sm">We analyze your requirements, understand your goals, and identify opportunities for optimization.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="process-step text-center reveal-card" style="transition-delay: 0.1s;">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-600/20 to-purple-600/5 border border-purple-500/30 flex items-center justify-center relative pulse-glow" style="animation-delay: 0.5s;">
+                        <span class="text-2xl font-bold text-purple-400">02</span>
+                        <div class="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="pen-tool" class="w-3 h-3 text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Strategy</h3>
+                    <p class="text-gray-400 text-sm">Our experts design a tailored solution architecture aligned with your business objectives.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="process-step text-center reveal-card" style="transition-delay: 0.2s;">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-pink-600/20 to-pink-600/5 border border-pink-500/30 flex items-center justify-center relative pulse-glow" style="animation-delay: 1s;">
+                        <span class="text-2xl font-bold text-pink-400">03</span>
+                        <div class="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="code" class="w-3 h-3 text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Implementation</h3>
+                    <p class="text-gray-400 text-sm">Agile development with regular milestones, testing, and quality assurance at every step.</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="process-step text-center reveal-card" style="transition-delay: 0.3s;">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-green-600/20 to-green-600/5 border border-green-500/30 flex items-center justify-center relative pulse-glow" style="animation-delay: 1.5s;">
+                        <span class="text-2xl font-bold text-green-400">04</span>
+                        <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="rocket" class="w-3 h-3 text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Launch & Support</h3>
+                    <p class="text-gray-400 text-sm">Seamless deployment followed by continuous monitoring, optimization, and 24/7 support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    PRICING PLANS
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 reveal-item">Flexible Pricing for Every Stage</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-12 reveal-item">Choose the plan that fits your business needs. Scale up or down anytime.</p>
+
+                <!-- Pricing Toggle -->
+                <div class="pricing-toggle reveal-item">
+                    <div class="pricing-toggle-slider" id="toggle-slider" style="width: 50%;"></div>
+                    <button class="pricing-toggle-btn active" id="monthly-btn" onclick="togglePricing('monthly')">Monthly</button>
+                    <button class="pricing-toggle-btn" id="annual-btn" onclick="togglePricing('annual')">Annual <span class="text-xs opacity-70">-20%</span></button>
+                </div>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Starter Plan -->
+                <div class="price-card glass-card p-8 rounded-3xl reveal-card">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Starter</h3>
+                        <p class="text-gray-400 text-sm">Perfect for small businesses</p>
+                    </div>
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold price-amount" data-monthly="999" data-annual="799">$999</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Up to 5 team members
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            20 hours support/month
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Basic security audit
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Email support
+                        </li>
+                    </ul>
+                    <button class="magnetic-btn w-full py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all font-medium">
+                        Get Started
+                    </button>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="price-card glass-card p-8 rounded-3xl popular reveal-card" style="transition-delay: 0.1s;">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Professional</h3>
+                        <p class="text-gray-400 text-sm">For growing enterprises</p>
+                    </div>
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold price-amount" data-monthly="2499" data-annual="1999">$2,499</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Up to 20 team members
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            60 hours support/month
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Advanced security suite
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            24/7 priority support
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Dedicated account manager
+                        </li>
+                    </ul>
+                    <button class="magnetic-btn w-full py-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all font-medium shadow-lg shadow-blue-600/30">
+                        Get Started
+                    </button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="price-card glass-card p-8 rounded-3xl reveal-card" style="transition-delay: 0.2s;">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Enterprise</h3>
+                        <p class="text-gray-400 text-sm">Custom solutions for large orgs</p>
+                    </div>
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold">Custom</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Unlimited team members
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Unlimited support hours
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Custom security solutions
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            On-site consulting
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="none">
+                                <path class="feature-check" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            SLA guarantees
+                        </li>
+                    </ul>
+                    <button class="magnetic-btn w-full py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all font-medium">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-32 relative overflow-hidden bg-dark-800/30">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    FAQ
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 reveal-item">Common Questions</h2>
+            </div>
+
+            <div class="space-y-4 reveal-item">
+                <!-- FAQ Item 1 -->
+                <div class="accordion-item glass-card rounded-2xl overflow-hidden">
+                    <button class="accordion-header w-full p-6 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
+                        <span class="font-semibold text-lg">How quickly can you start a new project?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            We can typically begin initial discovery and planning within 1-2 weeks of contract signing. For urgent requirements, we offer expedited onboarding with dedicated resources assigned within 48 hours. Our agile methodology ensures rapid iteration and delivery.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="accordion-item glass-card rounded-2xl overflow-hidden">
+                    <button class="accordion-header w-full p-6 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
+                        <span class="font-semibold text-lg">Do you offer ongoing support after project completion?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            Absolutely. We provide comprehensive post-launch support including 24/7 monitoring, maintenance, updates, and optimization. Our managed services ensure your systems remain secure, performant, and up-to-date with evolving business needs.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="accordion-item glass-card rounded-2xl overflow-hidden">
+                    <button class="accordion-header w-full p-6 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
+                        <span class="font-semibold text-lg">What technologies do you specialize in?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            Our expertise spans modern tech stacks including React, Node.js, Python, AWS/Azure/GCP, Kubernetes, and AI/ML frameworks. We stay current with emerging technologies and select the optimal stack based on your specific requirements and scalability needs.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="accordion-item glass-card rounded-2xl overflow-hidden">
+                    <button class="accordion-header w-full p-6 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
+                        <span class="font-semibold text-lg">How do you handle data security?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-gray-400"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">
+                            Security is embedded in every layer of our solutions. We follow OWASP guidelines, implement encryption at rest and in transit, conduct regular penetration testing, and maintain compliance with SOC 2, ISO 27001, and GDPR standards.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="py-32 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden reveal-item">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/40 to-dark-900/40"></div>
+                <div class="absolute top-0 left-1/4 w-64 h-64 bg-blue-600/30 rounded-full blur-[80px] animate-pulse"></div>
+                <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-600/30 rounded-full blur-[80px] animate-pulse" style="animation-delay: 1s;"></div>
+
+                <div class="relative z-10">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-6">Ready to Transform Your Business?</h2>
+                    <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">Let's discuss how our services can drive your digital transformation. Get a free consultation today.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="404.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white text-lg px-10 py-5 rounded-full font-medium transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 group">
+                            Schedule Consultation
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
+                        </a>
+                        <a href="404.html" class="magnetic-btn glass-panel hover:bg-white/10 text-white text-lg px-10 py-5 rounded-full font-medium transition-all flex items-center gap-2 group border border-white/10">
+                            <i data-lucide="phone" class="w-5 h-5"></i>
+                            Call Us Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+  <footer class="pt-20 pb-10 border-t border-white/5 bg-dark-900 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10 mb-16 group cursor-pointer">
+                <h2 class="text-6xl md:text-8xl font-bold tracking-tighter text-gray-500 group-hover:text-white transition-colors duration-500">LET'S CONNECT</h2>
+                <div class="w-20 h-20 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all magnetic-btn">
+                    <i data-lucide="arrow-up-right" class="w-8 h-8 group-hover:text-white"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 py-12 border-t border-white/10">
+                <div>
+                    <h4 class="font-semibold mb-6">Codeio</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Empowering businesses through innovative IT solutions and digital transformation since 2015.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-6">Company</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                                                <li><a href="index.html" class="hover:text-white transition-colors">Home</a></li>
+
+                        <li><a href="about.html" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="service.html" class="hover:text-white transition-colors">Service</a></li>
+                        <li><a href="project.html" class="hover:text-white transition-colors">Project</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-6">Services</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="404.html" class="hover:text-white transition-colors">Software Development</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">Cloud Solutions</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">Cybersecurity</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">IT Consulting</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-6">Connect</h4>
+                    <div class="flex gap-4 mb-6">
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+<i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+<i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">hello@codeio.tech</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-sm text-gray-500">
+                <p>&copy; 2024 Codeio. All rights reserved.</p>
+                <div class="flex gap-8 mt-4 md:mt-0">
+                    <a href="404.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="404.html" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="404.html" class="hover:text-white transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Register GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hide Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 500);
+        });
+
+        // ============================================
+        // MOBILE MENU FUNCTIONALITY - ADDED
+        // ============================================
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        const body = document.body;
+
+        // Function to open mobile menu
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            mobileMenuOverlay.classList.add('active');
+            body.classList.add('menu-open');
+            lucide.createIcons(); // Re-initialize icons for the menu
+        }
+
+        // Function to close mobile menu
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+
+        // Event listener for hamburger button
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openMobileMenu();
+            });
+        }
+
+        // Event listener for close button
+        if (mobileMenuClose) {
+            mobileMenuClose.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMobileMenu();
+            });
+        }
+
+        // Close menu when clicking on overlay
+        if (mobileMenuOverlay) {
+            mobileMenuOverlay.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+        }
+
+        // Close menu when clicking on links
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+            }
+        });
+        // ============================================
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            cursor.style.left = cursorX - 10 + 'px';
+            cursor.style.top = cursorY - 10 + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor hover effects
+        document.querySelectorAll('a, button, .magnetic-btn, .service-card').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Magnetic Button Effect
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // Service Card Spotlight Effect
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', `${x}%`);
+                card.style.setProperty('--mouse-y', `${y}%`);
+            });
+
+            // Click to expand
+            card.addEventListener('click', () => {
+                const isExpanded = card.classList.contains('expanded');
+                
+                // Close all cards
+                document.querySelectorAll('.service-card').forEach(c => {
+                    c.classList.remove('expanded');
+                });
+
+                // Open clicked card if it wasn't expanded
+                if (!isExpanded) {
+                    card.classList.add('expanded');
+                    // Smooth scroll to card
+                    setTimeout(() => {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
+            });
+        });
+
+        // Pricing Toggle
+        let currentPricing = 'monthly';
+        
+        function togglePricing(type) {
+            currentPricing = type;
+            const slider = document.getElementById('toggle-slider');
+            const monthlyBtn = document.getElementById('monthly-btn');
+            const annualBtn = document.getElementById('annual-btn');
+
+            if (type === 'annual') {
+                slider.style.transform = 'translateX(100%)';
+                monthlyBtn.classList.remove('active');
+                annualBtn.classList.add('active');
+            } else {
+                slider.style.transform = 'translateX(0)';
+                monthlyBtn.classList.add('active');
+                annualBtn.classList.remove('active');
+            }
+
+            // Animate price change
+            document.querySelectorAll('.price-amount').forEach(price => {
+                const monthly = price.getAttribute('data-monthly');
+                const annual = price.getAttribute('data-annual');
+                const newValue = type === 'monthly' ? monthly : annual;
+                
+                gsap.to(price, {
+                    innerHTML: newValue,
+                    duration: 0.5,
+                    snap: { innerHTML: 1 },
+                    onUpdate: function() {
+                        price.innerHTML = '$' + Math.ceil(this.targets()[0].innerHTML).toLocaleString();
+                    }
+                });
+            });
+        }
+
+        // Accordion
+        function toggleAccordion(button) {
+            const item = button.parentElement;
+            const isOpen = item.classList.contains('open');
+            
+            // Close all
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('open');
+            });
+
+            // Open clicked if wasn't open
+            if (!isOpen) {
+                item.classList.add('open');
+            }
+        }
+
+        // GSAP Animations
+        gsap.from(".reveal-badge", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.3,
+            ease: "power3.out"
+        });
+
+        gsap.from(".reveal-text", {
+            y: 100,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power4.out",
+            delay: 0.5
+        });
+
+        gsap.from(".reveal-paragraph", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.9,
+            ease: "power3.out"
+        });
+
+        gsap.from(".reveal-buttons", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 1.1,
+            ease: "power3.out"
+        });
+
+        // Scroll Reveal
+        gsap.utils.toArray('.reveal-item').forEach((element, i) => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                delay: i * 0.1
+            });
+        });
+
+        gsap.utils.toArray('.reveal-card').forEach((element, i) => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 60,
+                opacity: 0,
+                scale: 0.9,
+                duration: 0.8,
+                ease: "back.out(1.7)",
+                delay: i * 0.1
+            });
+        });
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+                navbar.querySelector('.glass-panel').style.background = 'rgba(0,0,0,0.8)';
+            } else {
+                navbar.classList.remove('shadow-lg');
+                navbar.querySelector('.glass-panel').style.background = 'rgba(255,255,255,0.03)';
+            }
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

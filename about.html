@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Codeio | Our Story & Team</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        dark: { 900: '#050505', 800: '#0a0a0a', 700: '#121212', card: '#161616' },
+                        brand: { blue: '#2563eb', purple: '#7c3aed', accent: '#3b82f6' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #7c3aed);
+            border-radius: 3px;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed, #3b82f6);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            filter: blur(8px);
+        }
+
+        .magnetic-btn:hover::before { opacity: 0.6; }
+
+        /* Team Card Spotlight Effect */
+        .team-card {
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(59, 130, 246, 0.15) 0%, 
+                transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .team-card:hover::before { opacity: 1; }
+
+        .team-image-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-image-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5,5,5,0.9) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .team-card:hover .team-image-wrapper::after { opacity: 1; }
+
+        .team-social {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .team-card:hover .team-social { transform: translate(-50%, -50%) scale(1); }
+
+        .team-social a {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+
+        .team-social a:hover {
+            background: #3b82f6;
+            transform: translateY(-4px);
+        }
+
+        /* Value Card Animation */
+        .value-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s;
+            pointer-events: none;
+        }
+
+        .value-card:hover::after { opacity: 1; }
+
+        .value-icon {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .value-card:hover .value-icon {
+            transform: rotateY(360deg) scale(1.1);
+        }
+
+        /* Timeline */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #3b82f6, #7c3aed, #3b82f6);
+            background-size: 100% 200%;
+            animation: gradient-flow 3s ease infinite;
+            transform: translateX(-50%);
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .timeline-dot {
+            position: relative;
+            z-index: 10;
+        }
+
+        .timeline-dot::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
+        }
+
+        .timeline-item:hover .timeline-dot::before { opacity: 1; }
+
+        /* Stats Counter */
+        .stat-number { font-variant-numeric: tabular-nums; }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes float-reverse {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(20px) rotate(-5deg); }
+        }
+
+        .floating { animation: float 6s ease-in-out infinite; }
+        .floating-reverse { animation: float-reverse 8s ease-in-out infinite; }
+
+        /* Pulse Glow */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+        }
+
+        .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+        /* Shimmer */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s, width 0.3s, height 0.3s;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor.hover {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: #050505;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-circle {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Navigation Link Hover */
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #7c3aed);
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .nav-link:hover::after { transform: translateX(0); }
+
+        /* Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-item.open .accordion-content { max-height: 500px; }
+
+        .accordion-icon { transition: transform 0.3s; }
+        .accordion-item.open .accordion-icon { transform: rotate(180deg); }
+
+        /* Office Card */
+        .office-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .office-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(124,58,237,0.2));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .office-card:hover::before { opacity: 1; }
+
+        .office-card .office-map {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.4s, transform 0.4s;
+            transform: scale(1.1);
+        }
+
+        .office-card:hover .office-map {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+
+        /* Story Image Reveal */
+        .story-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-image-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #3b82f6;
+            z-index: 2;
+            transform: scaleX(1);
+            transform-origin: right;
+            transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .story-image-container.revealed::before {
+            transform: scaleX(0);
+        }
+
+        /* Kinetic Text */
+        .kinetic-text span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100px) rotateX(-90deg);
+            transform-origin: center bottom;
+        }
+
+        .kinetic-text.animate span {
+            opacity: 1;
+            transform: translateY(0) rotateX(0);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9998;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .mobile-menu a {
+            font-size: 2rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            color: #3b82f6;
+        }
+
+        /* Prevent body scroll when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-close" id="mobile-menu-close">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </div>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="service.html">Services</a>
+        <a href="project.html">Project</a>
+        <a href="contact.html">Contact</a>
+        <a href="login.html" class="mt-8 bg-blue-600 px-8 py-3 rounded-full text-lg">Login</a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-500" id="navbar">
+        <div class="absolute inset-0 glass-panel border-b-0"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex justify-between items-center h-20">
+                         <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+    
+    <!--  NEW LOGO -->
+    <div class="w-10 h-10 rounded-xl overflow-hidden">
+        <img src="logo.webp" alt="logo" class="w-full h-full object-cover">
+    </div>
+
+    <span class="font-bold text-xl tracking-tight">Stackly</span>
+</div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Home</a>
+                    <a href="about.html" class="nav-link text-white transition-colors text-sm font-medium py-2">About Us</a>
+                    <a href="service.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Services</a>
+                    <a href="project.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Project</a>
+                    <a href="contact.html" class="nav-link text-gray-300 hover:text-white transition-colors text-sm font-medium py-2">Contact</a>
+                </div>
+
+                <div class="hidden md:flex items-center">
+                    <a href="login.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 group">
+                        Login
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                    </a>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none p-2" aria-label="Open menu">
+                        <i data-lucide="menu" class="w-8 h-8"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px] animate-pulse"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] animate-pulse" style="animation-delay: 1s;"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-900/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <!-- Floating Elements -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="floating absolute top-32 left-10 w-32 h-32 border border-blue-500/20 rounded-2xl rotate-12 hidden lg:block"></div>
+            <div class="floating-reverse absolute top-40 right-20 w-40 h-40 border border-purple-500/20 rounded-full hidden lg:block" style="animation-delay: 2s;"></div>
+            <div class="floating absolute bottom-32 left-1/4 w-24 h-24 bg-gradient-to-br from-blue-600/10 to-purple-600/10 rounded-lg rotate-45 hidden lg:block" style="animation-delay: 1s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 reveal-badge">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wider uppercase text-gray-300">About Codeio</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight mb-8 kinetic-text" id="hero-title">
+                <span class="block">We Are</span>
+                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">Builders</span>
+            </h1>
+
+            <p class="mt-6 max-w-3xl mx-auto text-xl md:text-2xl text-gray-400 mb-12 reveal-paragraph leading-relaxed">
+                A collective of innovators, creators, and technologists dedicated to crafting digital experiences that transform businesses and inspire users worldwide.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center reveal-buttons">
+                <a href="404.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 rounded-full font-medium transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 group">
+                    Our Story
+                    <i data-lucide="arrow-down" class="w-5 h-5 group-hover:translate-y-1 transition-transform"></i>
+                </a>
+                <a href="404.html" class="magnetic-btn glass-panel hover:bg-white/10 text-white text-lg px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 group border border-white/10">
+                    Meet The Team
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+            <span class="text-xs uppercase tracking-widest">Scroll</span>
+            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+        </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section id="story" class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Content -->
+                <div class="relative order-2 lg:order-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        OUR STORY
+                    </div>
+                    
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight reveal-item">
+                        Pioneering IT Excellence Since <span class="text-gradient">2015</span>
+                    </h2>
+                    
+                    <div class="space-y-6 text-gray-400 text-lg leading-relaxed reveal-item">
+                        <p>
+                            Founded with a vision to bridge the gap between complex technology and business growth, Codeio began as a small team of three passionate developers working from a garage in East London. Today, we've evolved into a global force of innovation with over 150 team members across 8 countries.
+                        </p>
+                        <p>
+                            Our journey has been defined by relentless curiosity and an unwavering commitment to our clients' success. From startups to Fortune 500 companies, we've helped transform digital landscapes across industries including fintech, healthcare, e-commerce, and enterprise software.
+                        </p>
+                        <p>
+                            We believe technology should empower, not complicate. Every solution we craft is designed with human-centric principles, ensuring seamless integration and tangible results that drive real business value.
+                        </p>
+                    </div>
+
+                    <div class="mt-10 flex flex-wrap gap-4 reveal-item">
+                        <div class="glass-card px-6 py-3 rounded-full flex items-center gap-3">
+                            <i data-lucide="award" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-sm font-medium">ISO 27001 Certified</span>
+                        </div>
+                        <div class="glass-card px-6 py-3 rounded-full flex items-center gap-3">
+                            <i data-lucide="cloud" class="w-5 h-5 text-purple-400"></i>
+                            <span class="text-sm font-medium">AWS Partner</span>
+                        </div>
+                        <div class="glass-card px-6 py-3 rounded-full flex items-center gap-3">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-green-400"></i>
+                            <span class="text-sm font-medium">SOC 2 Compliant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual -->
+                <div class="relative h-[700px] order-1 lg:order-2 reveal-visual">
+                    <!-- Main Image with Reveal Animation -->
+                    <div class="story-image-container absolute inset-0 rounded-3xl overflow-hidden tilt-card" id="story-image">
+                        <img src="img5 (4).webp" 
+                             alt="Team collaboration" 
+                             class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                    </div>
+
+                    <!-- Floating Stats Cards -->
+                    <div class="absolute -top-6 -right-6 glass-card p-6 rounded-2xl shimmer pulse-glow reveal-card cursor-pointer hover:scale-110 transition-transform" style="animation-delay: 0.3s;">
+                        <div class="text-4xl font-bold text-white mb-1 stat-number" data-target="150">0</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wider">Team Members</div>
+                    </div>
+
+                    <div class="absolute top-1/3 -left-8 glass-card p-6 rounded-2xl shimmer reveal-card cursor-pointer hover:scale-110 transition-transform" style="animation-delay: 0.5s;">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-green-400"></i>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-white stat-number" data-target="98">0</div>
+                                <div class="text-xs text-gray-400">% Growth Rate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute -bottom-6 right-12 glass-card p-6 rounded-2xl shimmer reveal-card cursor-pointer hover:scale-110 transition-transform" style="animation-delay: 0.7s;">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-current"></i>
+                        </div>
+                        <div class="text-sm font-medium text-white">4.9/5 Rating</div>
+                        <div class="text-xs text-gray-400 mt-1">Based on 420+ reviews</div>
+                    </div>
+
+                    <!-- Decorative Elements -->
+                    <div class="absolute bottom-20 left-10 w-20 h-20 border border-blue-500/30 rounded-full floating hidden lg:block"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Values Section -->
+    <section class="py-32 relative overflow-hidden bg-dark-800/30">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0); background-size: 40px 40px;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    MISSION & VALUES
+                </div>
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 reveal-item">What Drives Us Forward</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto reveal-item">Our core principles guide every decision we make and every solution we create</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Mission -->
+                <div class="value-card glass-card p-10 rounded-3xl group reveal-card tilt-card cursor-pointer">
+                    <div class="value-icon w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-600/5 flex items-center justify-center mb-8 border border-blue-500/30">
+                        <i data-lucide="target" class="w-10 h-10 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Our Mission</h3>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        To democratize technology by creating accessible, innovative solutions that empower businesses to thrive in the digital age. We transform complexity into simplicity.
+                    </p>
+                    <div class="flex items-center gap-2 text-blue-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>Learn more</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+                <!-- Vision -->
+                <div class="value-card glass-card p-10 rounded-3xl group reveal-card tilt-card cursor-pointer" style="transition-delay: 0.1s;">
+                    <div class="value-icon w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600/20 to-purple-600/5 flex items-center justify-center mb-8 border border-purple-500/30">
+                        <i data-lucide="eye" class="w-10 h-10 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Our Vision</h3>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        To be the catalyst for digital transformation worldwide, setting new standards in IT excellence and creating a future where technology serves humanity seamlessly.
+                    </p>
+                    <div class="flex items-center gap-2 text-purple-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>Explore</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+                <!-- Values -->
+                <div class="value-card glass-card p-10 rounded-3xl group reveal-card tilt-card cursor-pointer" style="transition-delay: 0.2s;">
+                    <div class="value-icon w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-600/20 to-pink-600/5 flex items-center justify-center mb-8 border border-pink-500/30">
+                        <i data-lucide="heart" class="w-10 h-10 text-pink-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Our Values</h3>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Innovation, integrity, and impact guide every decision. We believe in transparent partnerships, continuous learning, and delivering results that exceed expectations.
+                    </p>
+                    <div class="flex items-center gap-2 text-pink-400 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>Discover</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    OUR JOURNEY
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 reveal-item">Milestones That Define Us</h2>
+            </div>
+
+            <div class="relative">
+                <!-- Timeline Line -->
+                <div class="timeline-line hidden md:block"></div>
+
+                <!-- Timeline Items -->
+                <div class="space-y-16 md:space-y-24">
+                    <!-- 2015 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center reveal-timeline">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-8 md:mb-0">
+                            <div class="glass-card p-8 rounded-3xl inline-block hover:scale-105 transition-transform cursor-pointer group">
+                                <div class="text-4xl font-bold text-gradient mb-3">2015</div>
+                                <h3 class="text-2xl font-semibold mb-3 group-hover:text-blue-400 transition-colors">The Beginning</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed max-w-sm">
+                                    Codeio founded in London with a team of 3 passionate developers working from a garage. First client project delivered within 3 months.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="timeline-dot w-6 h-6 rounded-full bg-dark-900 border-4 border-blue-500 z-10 hidden md:block pulse-glow"></div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <div class="w-20 h-20 rounded-2xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30 floating">
+                                <i data-lucide="rocket" class="w-10 h-10 text-blue-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2018 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center reveal-timeline">
+                        <div class="md:w-1/2 md:pr-12 md:text-right order-1 md:order-1 mb-8 md:mb-0 flex justify-end">
+                            <div class="w-20 h-20 rounded-2xl bg-purple-500/20 flex items-center justify-center border border-purple-500/30 floating" style="animation-delay: 1s;">
+                                <i data-lucide="globe" class="w-10 h-10 text-purple-400"></i>
+                            </div>
+                        </div>
+                        <div class="timeline-dot w-6 h-6 rounded-full bg-dark-900 border-4 border-purple-500 z-10 hidden md:block pulse-glow" style="animation-delay: 0.5s;"></div>
+                        <div class="md:w-1/2 md:pl-12 order-2 md:order-2">
+                            <div class="glass-card p-8 rounded-3xl inline-block hover:scale-105 transition-transform cursor-pointer group">
+                                <div class="text-4xl font-bold text-gradient mb-3">2018</div>
+                                <h3 class="text-2xl font-semibold mb-3 group-hover:text-purple-400 transition-colors">Global Expansion</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed max-w-sm">
+                                    Expanded to 3 countries, grew to 50+ employees, and secured Series A funding. Opened offices in New York and Singapore.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2021 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center reveal-timeline">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-8 md:mb-0">
+                            <div class="glass-card p-8 rounded-3xl inline-block hover:scale-105 transition-transform cursor-pointer group">
+                                <div class="text-4xl font-bold text-gradient mb-3">2021</div>
+                                <h3 class="text-2xl font-semibold mb-3 group-hover:text-pink-400 transition-colors">Innovation Hub</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed max-w-sm">
+                                    Launched R&D division, filed 12 patents, recognized as "Top IT Innovator" by Tech Weekly. AI and ML capabilities added.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="timeline-dot w-6 h-6 rounded-full bg-dark-900 border-4 border-pink-500 z-10 hidden md:block pulse-glow" style="animation-delay: 1s;"></div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <div class="w-20 h-20 rounded-2xl bg-pink-500/20 flex items-center justify-center border border-pink-500/30 floating" style="animation-delay: 2s;">
+                                <i data-lucide="lightbulb" class="w-10 h-10 text-pink-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2024 -->
+                    <div class="timeline-item relative flex flex-col md:flex-row items-center reveal-timeline">
+                        <div class="md:w-1/2 md:pr-12 md:text-right order-1 md:order-1 mb-8 md:mb-0 flex justify-end">
+                            <div class="w-20 h-20 rounded-2xl bg-green-500/20 flex items-center justify-center border border-green-500/30 floating" style="animation-delay: 1.5s;">
+                                <i data-lucide="crown" class="w-10 h-10 text-green-400"></i>
+                            </div>
+                        </div>
+                        <div class="timeline-dot w-6 h-6 rounded-full bg-dark-900 border-4 border-green-500 z-10 hidden md:block pulse-glow" style="animation-delay: 1.5s;"></div>
+                        <div class="md:w-1/2 md:pl-12 order-2 md:order-2">
+                            <div class="glass-card p-8 rounded-3xl inline-block hover:scale-105 transition-transform cursor-pointer group border-green-500/30">
+                                <div class="text-4xl font-bold text-gradient mb-3">2024</div>
+                                <h3 class="text-2xl font-semibold mb-3 group-hover:text-green-400 transition-colors">Industry Leader</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed max-w-sm">
+                                    150+ team members, 500+ successful projects, offices in 8 countries. Recognized as top 100 global IT service providers.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-32 relative overflow-hidden bg-gradient-to-b from-dark-900 to-dark-800">
+        <div class="absolute inset-0">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center reveal-stat">
+                    <div class="text-5xl md:text-7xl font-bold text-gradient stat-number mb-2" data-target="150">0</div>
+                    <div class="text-gray-400 uppercase tracking-wider text-sm">Team Members</div>
+                </div>
+                <div class="text-center reveal-stat" style="transition-delay: 0.1s;">
+                    <div class="text-5xl md:text-7xl font-bold text-gradient stat-number mb-2" data-target="500">0</div>
+                    <div class="text-gray-400 uppercase tracking-wider text-sm">Projects Delivered</div>
+                </div>
+                <div class="text-center reveal-stat" style="transition-delay: 0.2s;">
+                    <div class="text-5xl md:text-7xl font-bold text-gradient stat-number mb-2" data-target="98">0</div>
+                    <div class="text-gray-400 uppercase tracking-wider text-sm">% Client Satisfaction</div>
+                </div>
+                <div class="text-center reveal-stat" style="transition-delay: 0.3s;">
+                    <div class="text-5xl md:text-7xl font-bold text-gradient stat-number mb-2" data-target="8">0</div>
+                    <div class="text-gray-400 uppercase tracking-wider text-sm">Global Offices</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    OUR TEAM
+                </div>
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 reveal-item">Meet The Innovators</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto reveal-item">Our diverse team of experts brings together decades of experience across technology, design, and business strategy.</p>
+            </div>
+
+            <!-- Leadership Team -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                <!-- CEO -->
+                <div class="team-card glass-card rounded-3xl overflow-hidden group reveal-card tilt-card cursor-pointer">
+                    <div class="team-image-wrapper relative h-80">
+                        <img src="small4.webp" 
+                             alt="James Mitchell" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        
+                        <div class="team-social">
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10 bg-dark-900/50 backdrop-blur-sm">
+                        <h3 class="text-xl font-semibold mb-1">James Mitchell</h3>
+                        <p class="text-blue-400 text-sm mb-3">CEO & Founder</p>
+                        <p class="text-gray-400 text-sm">Visionary leader with 15+ years in tech innovation and business strategy.</p>
+                    </div>
+                </div>
+
+                <!-- CTO -->
+                <div class="team-card glass-card rounded-3xl overflow-hidden group reveal-card tilt-card cursor-pointer" style="transition-delay: 0.1s;">
+                    <div class="team-image-wrapper relative h-80">
+                        <img src="small5.webp" 
+                             alt="Sarah Chen" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        
+                        <div class="team-social">
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="github" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10 bg-dark-900/50 backdrop-blur-sm">
+                        <h3 class="text-xl font-semibold mb-1">Sarah Chen</h3>
+                        <p class="text-purple-400 text-sm mb-3">Chief Technology Officer</p>
+                        <p class="text-gray-400 text-sm">Full-stack expert specializing in cloud architecture and AI solutions.</p>
+                    </div>
+                </div>
+
+                <!-- Design Lead -->
+                <div class="team-card glass-card rounded-3xl overflow-hidden group reveal-card tilt-card cursor-pointer" style="transition-delay: 0.2s;">
+                    <div class="team-image-wrapper relative h-80">
+                        <img src="small6 (1).webp" 
+                             alt="Marcus Johnson" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        
+                        <div class="team-social">
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="dribbble" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10 bg-dark-900/50 backdrop-blur-sm">
+                        <h3 class="text-xl font-semibold mb-1">Marcus Johnson</h3>
+                        <p class="text-pink-400 text-sm mb-3">Head of Design</p>
+                        <p class="text-gray-400 text-sm">Award-winning designer creating intuitive digital experiences.</p>
+                    </div>
+                </div>
+
+                <!-- COO -->
+                <div class="team-card glass-card rounded-3xl overflow-hidden group reveal-card tilt-card cursor-pointer" style="transition-delay: 0.3s;">
+                    <div class="team-image-wrapper relative h-80">
+                        <img src="small4.webp" 
+                             alt="Emily Rodriguez" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        
+                        <div class="team-social">
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                            <a href="404.html" class="magnetic-btn"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10 bg-dark-900/50 backdrop-blur-sm">
+                        <h3 class="text-xl font-semibold mb-1">Emily Rodriguez</h3>
+                        <p class="text-green-400 text-sm mb-3">Chief Operating Officer</p>
+                        <p class="text-gray-400 text-sm">Operations expert ensuring seamless project delivery worldwide.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Join Team CTA -->
+            <div class="text-center reveal-item">
+                <div class="glass-card inline-flex items-center gap-6 p-2 pr-8 rounded-full border border-white/10">
+                    <div class="flex -space-x-3">
+                        <img class="w-10 h-10 rounded-full border-2 border-dark-900" src="small4.webp" alt="">
+                        <img class="w-10 h-10 rounded-full border-2 border-dark-900" src="small5.webp" alt="">
+                        <img class="w-10 h-10 rounded-full border-2 border-dark-900" src="small6 (1).webp" alt="">
+                        <div class="w-10 h-10 rounded-full border-2 border-dark-900 bg-blue-600 flex items-center justify-center text-xs font-medium">+50</div>
+                    </div>
+                    <span class="text-gray-300 text-sm">Join our growing team</span>
+                    <a href="404.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-sm font-medium transition-all">
+                        View Openings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Offices -->
+    <section class="py-32 relative overflow-hidden bg-dark-800/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6 reveal-item">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    GLOBAL PRESENCE
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 reveal-item">Our Offices Worldwide</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- London -->
+                <div class="office-card glass-card p-8 rounded-3xl text-center group cursor-pointer reveal-card tilt-card">
+                    <div class="relative w-full h-32 mb-6 rounded-2xl overflow-hidden">
+                        <img src="2img.webp" 
+                             alt="London" 
+                             class="office-map w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-dark-900/40 group-hover:bg-dark-900/20 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform backdrop-blur-sm border border-blue-500/30">
+                                <i data-lucide="map-pin" class="w-8 h-8 text-blue-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">London</h3>
+                    <p class="text-gray-400 text-sm mb-4">United Kingdom</p>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span class="text-xs text-blue-400">Headquarters</span>
+                    </div>
+                </div>
+
+                <!-- New York -->
+                <div class="office-card glass-card p-8 rounded-3xl text-center group cursor-pointer reveal-card tilt-card" style="transition-delay: 0.1s;">
+                    <div class="relative w-full h-32 mb-6 rounded-2xl overflow-hidden">
+                        <img src="3img.webp" 
+                             alt="New York" 
+                             class="office-map w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-dark-900/40 group-hover:bg-dark-900/20 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform backdrop-blur-sm border border-purple-500/30">
+                                <i data-lucide="map-pin" class="w-8 h-8 text-purple-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">New York</h3>
+                    <p class="text-gray-400 text-sm mb-4">United States</p>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        <span class="text-xs text-purple-400">Americas Hub</span>
+                    </div>
+                </div>
+
+                <!-- Singapore -->
+                <div class="office-card glass-card p-8 rounded-3xl text-center group cursor-pointer reveal-card tilt-card" style="transition-delay: 0.2s;">
+                    <div class="relative w-full h-32 mb-6 rounded-2xl overflow-hidden">
+                        <img src="7img.webp" 
+                             alt="Singapore" 
+                             class="office-map w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-dark-900/40 group-hover:bg-dark-900/20 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-pink-500/20 flex items-center justify-center group-hover:scale-110 transition-transform backdrop-blur-sm border border-pink-500/30">
+                                <i data-lucide="map-pin" class="w-8 h-8 text-pink-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Singapore</h3>
+                    <p class="text-gray-400 text-sm mb-4">Asia Pacific</p>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20">
+                        <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                        <span class="text-xs text-pink-400">APAC Center</span>
+                    </div>
+                </div>
+
+                <!-- Berlin -->
+                <div class="office-card glass-card p-8 rounded-3xl text-center group cursor-pointer reveal-card tilt-card" style="transition-delay: 0.3s;">
+                    <div class="relative w-full h-32 mb-6 rounded-2xl overflow-hidden">
+                        <img src="10img.webp" 
+                             alt="Berlin" 
+                             class="office-map w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-dark-900/40 group-hover:bg-dark-900/20 transition-colors">
+                            <div class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform backdrop-blur-sm border border-green-500/30">
+                                <i data-lucide="map-pin" class="w-8 h-8 text-green-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Berlin</h3>
+                    <p class="text-gray-400 text-sm mb-4">Germany</p>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-green-400">European Office</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Culture Section -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="reveal-item">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        OUR CULTURE
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">Where Innovation Meets Impact</h2>
+                    <p class="text-gray-400 text-lg leading-relaxed mb-8">
+                        At Codeio, we foster a culture of continuous learning, collaboration, and excellence. We believe the best solutions emerge when diverse perspectives come together to solve complex challenges.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="zap" class="w-6 h-6 text-blue-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Innovation First</h4>
+                                <p class="text-gray-400 text-sm">We invest 20% of time in R&D and exploring emerging technologies.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="users" class="w-6 h-6 text-purple-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">People-Centric</h4>
+                                <p class="text-gray-400 text-sm">Flexible working, professional development, and wellness programs.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="globe-2" class="w-6 h-6 text-pink-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Global Diversity</h4>
+                                <p class="text-gray-400 text-sm">Team members from 25+ countries bringing diverse perspectives.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative h-[500px] reveal-visual">
+                    <div class="absolute inset-0 grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <div class="glass-card rounded-2xl p-4 shimmer">
+                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=300" class="w-full h-32 object-cover rounded-xl mb-3">
+                                <div class="text-sm font-medium">Team Collaboration</div>
+                            </div>
+                            <div class="glass-card rounded-2xl p-4 shimmer" style="animation-delay: 0.5s;">
+                                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=300" class="w-full h-40 object-cover rounded-xl mb-3">
+                                <div class="text-sm font-medium">Modern Workspace</div>
+                            </div>
+                        </div>
+                        <div class="space-y-4 pt-8">
+                            <div class="glass-card rounded-2xl p-4 shimmer" style="animation-delay: 0.25s;">
+                                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=300" class="w-full h-40 object-cover rounded-xl mb-3">
+                                <div class="text-sm font-medium">Innovation Labs</div>
+                            </div>
+                            <div class="glass-card rounded-2xl p-4 shimmer" style="animation-delay: 0.75s;">
+                                <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=300" class="w-full h-32 object-cover rounded-xl mb-3">
+                                <div class="text-sm font-medium">Team Events</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="py-32 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden reveal-item">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/40 to-dark-900/40"></div>
+                <div class="absolute top-0 left-1/4 w-64 h-64 bg-blue-600/30 rounded-full blur-[80px] animate-pulse"></div>
+                <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-600/30 rounded-full blur-[80px] animate-pulse" style="animation-delay: 1s;"></div>
+
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-white/10 text-xs font-medium text-gray-300 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        JOIN US
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-bold mb-6">Ready to Build The Future?</h2>
+                    <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">Let's collaborate and create something extraordinary together. Your digital transformation starts with a conversation.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="404.html" class="magnetic-btn bg-blue-600 hover:bg-blue-700 text-white text-lg px-10 py-5 rounded-full font-medium transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 group">
+                            Schedule Consultation
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
+                        </a>
+                        <a href="404.html" class="magnetic-btn glass-panel hover:bg-white/10 text-white text-lg px-10 py-5 rounded-full font-medium transition-all flex items-center gap-2 group border border-white/10">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                            Contact Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-20 pb-10 border-t border-white/5 bg-dark-900 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10 mb-16 group cursor-pointer">
+                <h2 class="text-6xl md:text-8xl font-bold tracking-tighter text-gray-500 group-hover:text-white transition-colors duration-500">LET'S CONNECT</h2>
+                <div class="w-20 h-20 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all magnetic-btn">
+                    <i data-lucide="arrow-up-right" class="w-8 h-8 group-hover:text-white"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 py-12 border-t border-white/10">
+                <div>
+                    <h4 class="font-semibold mb-6">Stackly</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Empowering businesses through innovative IT solutions and digital transformation since 2015.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-6">Company</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                                                <li><a href="index.html" class="hover:text-white transition-colors">Home</a></li>
+
+                        <li><a href="about.html" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="service.html" class="hover:text-white transition-colors">Service</a></li>
+                        <li><a href="project.html" class="hover:text-white transition-colors">Project</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-6">Services</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="404.html" class="hover:text-white transition-colors">Software Development</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">Cloud Solutions</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">Cybersecurity</a></li>
+                        <li><a href="404.html" class="hover:text-white transition-colors">IT Consulting</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-6">Connect</h4>
+                    <div class="flex gap-4 mb-6">
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+<i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="404.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-gray-400 magnetic-btn">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">hello@codeio.tech</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-sm text-gray-500">
+                <p>&copy; 2024 Codeio. All rights reserved.</p>
+                <div class="flex gap-8 mt-4 md:mt-0">
+                    <a href="404.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="404.html" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="404.html" class="hover:text-white transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Register GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hide Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+                
+                // Trigger hero animations
+                document.getElementById('hero-title').classList.add('animate');
+                const chars = document.querySelectorAll('.kinetic-text span');
+                chars.forEach((char, i) => {
+                    char.style.transitionDelay = `${i * 0.1}s`;
+                    char.classList.add('animate');
+                });
+            }, 500);
+        });
+
+        // ============================================
+        // MOBILE MENU FUNCTIONALITY - FIXED
+        // ============================================
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        const body = document.body;
+
+        // Function to open mobile menu
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            body.classList.add('menu-open');
+            lucide.createIcons(); // Re-initialize icons for the menu
+        }
+
+        // Function to close mobile menu
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+
+        // Event listener for hamburger button
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openMobileMenu();
+            });
+        }
+
+        // Event listener for close button
+        if (mobileMenuClose) {
+            mobileMenuClose.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMobileMenu();
+            });
+        }
+
+        // Close menu when clicking on links
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileMenu.classList.contains('active') && 
+                !mobileMenu.contains(e.target) && 
+                !mobileMenuBtn.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+        // ============================================
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            cursor.style.left = cursorX - 10 + 'px';
+            cursor.style.top = cursorY - 10 + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor hover effects
+        document.querySelectorAll('a, button, .magnetic-btn, .team-card, .tilt-card').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Magnetic Button Effect
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // Team Card Spotlight Effect
+        document.querySelectorAll('.team-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', `${x}%`);
+                card.style.setProperty('--mouse-y', `${y}%`);
+            });
+        });
+
+        // 3D Tilt Effect
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        });
+
+        // Story Image Reveal
+        ScrollTrigger.create({
+            trigger: "#story-image",
+            start: "top 80%",
+            onEnter: () => {
+                document.getElementById('story-image').classList.add('revealed');
+            }
+        });
+
+        // GSAP Animations
+        gsap.from(".reveal-badge", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.3,
+            ease: "power3.out"
+        });
+
+        gsap.from(".reveal-paragraph", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.9,
+            ease: "power3.out"
+        });
+
+        gsap.from(".reveal-buttons", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 1.1,
+            ease: "power3.out"
+        });
+
+        // Scroll Reveal
+        gsap.utils.toArray('.reveal-item').forEach((element, i) => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                delay: i * 0.1
+            });
+        });
+
+        gsap.utils.toArray('.reveal-card').forEach((element, i) => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 60,
+                opacity: 0,
+                scale: 0.9,
+                duration: 0.8,
+                ease: "back.out(1.7)",
+                delay: i * 0.1
+            });
+        });
+
+        gsap.utils.toArray('.reveal-timeline').forEach((element, i) => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                },
+                x: i % 2 === 0 ? -50 : 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // Stats Counter Animation
+        let statsAnimated = false;
+        ScrollTrigger.create({
+            trigger: ".reveal-stat",
+            start: "top 80%",
+            onEnter: () => {
+                if (!statsAnimated) {
+                    statsAnimated = true;
+                    document.querySelectorAll('.stat-number').forEach(stat => {
+                        const target = parseInt(stat.getAttribute('data-target'));
+                        gsap.to(stat, {
+                            innerHTML: target,
+                            duration: 2,
+                            ease: "power2.out",
+                            snap: { innerHTML: 1 },
+                            onUpdate: function() {
+                                stat.innerHTML = Math.ceil(this.targets()[0].innerHTML) + (target > 100 ? '+' : '');
+                            }
+                        });
+                    });
+                }
+            }
+        });
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+                navbar.querySelector('.glass-panel').style.background = 'rgba(0,0,0,0.8)';
+            } else {
+                navbar.classList.remove('shadow-lg');
+                navbar.querySelector('.glass-panel').style.background = 'rgba(255,255,255,0.03)';
+            }
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

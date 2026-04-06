@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 3px;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .bg-mesh {
+            background: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(34, 211, 238, 0.15) 0px, transparent 50%);
+            background-color: #0f172a;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            max-width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+            width: calc(100% - 260px);
+            max-width: calc(100% - 260px);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .content-wrapper {
+            padding: 1.5rem;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-item:hover:not(.active) {
+            background: rgba(30, 41, 59, 0.5);
+            color: #e2e8f0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .float-anim {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-online { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .status-warning { background: #eab308; box-shadow: 0 0 8px #eab308; }
+        .status-offline { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .custom-table th,
+        .custom-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+        }
+
+        .custom-table tr:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .page-title {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="bg-mesh text-slate-200">
+
+    <div id="overlay" class="overlay lg:hidden" onclick="toggleSidebar()"></div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar glass">
+            <div class="flex flex-col h-full p-5">
+                <div class="flex items-center gap-3 mb-8 float-anim">
+                    <!-- <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-cube text-white text-lg"></i>
+                    </div> -->
+                    <div>
+          <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+    
+    <!-- 🔥 NEW LOGO -->
+    <div class="w-10 h-10 rounded-xl overflow-hidden">
+        <img src="logo.webp" alt="logo" class="w-full h-full object-cover">
+    </div>
+
+    <span class="font-bold text-xl tracking-tight">Stackly</span>
+</div>                        <p class="text-xs text-slate-400">Admin Panel</p>
+                    </div>
+                </div>
+
+                <nav class="flex-1 space-y-1">
+                    <button onclick="showTab('dashboard')" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all" data-tab="dashboard">
+                        <i class="fas fa-home w-5"></i>
+                        <span class="font-medium text-sm">Dashboard</span>
+                    </button>
+                    <button onclick="showTab('servers')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 text-left transition-all" data-tab="servers">
+                        <i class="fas fa-server w-5"></i>
+                        <span class="font-medium text-sm">Servers</span>
+                        <span class="ml-auto text-xs bg-slate-700 px-2 py-0.5 rounded-full text-slate-300">12</span>
+                    </button>
+                    <button onclick="showTab('network')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 text-left transition-all" data-tab="network">
+                        <i class="fas fa-network-wired w-5"></i>
+                        <span class="font-medium text-sm">Network</span>
+                    </button>
+                    <button onclick="showTab('security')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 text-left transition-all" data-tab="security">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span class="font-medium text-sm">Security</span>
+                        <span class="ml-auto text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">3</span>
+                    </button>
+                    <button onclick="showTab('users')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 text-left transition-all" data-tab="users">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="font-medium text-sm">Users</span>
+                    </button>
+                    <!-- <button onclick="showTab('analytics')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 text-left transition-all" data-tab="analytics">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span class="font-medium text-sm">Analytics</span>
+                    </button> -->
+                    <button onclick="showTab('settings')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 text-left transition-all" data-tab="settings">
+                        <i class="fas fa-cog w-5"></i>
+                        <span class="font-medium text-sm">Settings</span>
+                    </button>
+                </nav>
+
+                <div class="mt-4 p-4 rounded-xl glass-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-slate-300">Storage</span>
+                        <span class="text-xs text-slate-400">78%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all" style="width: 78%"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">1.2TB of 1.5TB used</p>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="Admin" class="w-9 h-9 rounded-full border-2 border-blue-500/30">
+                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-slate-900"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-slate-200 truncate">Alex Morgan</p>
+                            <p class="text-xs text-slate-500 truncate">Administrator</p>
+                        </div>
+                        <button class="text-slate-400 hover:text-slate-200 transition-colors">
+                        <a href="404.html"><i class="fas fa-sign-out-alt text-sm"></i></a>    
+                        
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="sticky top-0 z-30 glass px-6 py-4">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-slate-800/50 text-slate-400 transition-colors">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <div id="header-title">
+                            <h2 class="text-lg font-semibold text-slate-100 page-title">Dashboard Overview</h2>
+                            <p class="text-sm text-slate-400">Welcome back, Alex</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                            <i class="fas fa-search text-slate-500 text-sm"></i>
+                            <input type="text" placeholder="Search..." class="bg-transparent border-none outline-none text-sm text-slate-200 w-40 placeholder-slate-500">
+                        </div>
+                        <button class="relative p-2 rounded-xl hover:bg-slate-800/50 text-slate-400 hover:text-slate-200 transition-colors">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">5</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- DASHBOARD TAB -->
+                <div id="dashboard" class="tab-content active space-y-6">
+                    <div class="stats-grid">
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="p-2.5 rounded-xl bg-blue-500/20 text-blue-400"><i class="fas fa-server text-lg"></i></div>
+                                <span class="flex items-center text-xs text-green-400 font-medium"><i class="fas fa-arrow-up mr-1"></i> 12%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-100 mb-1">24</h3>
+                            <p class="text-sm text-slate-400">Active Servers</p>
+                            <div class="mt-3 flex items-center gap-2"><span class="status-dot status-online"></span><span class="text-xs text-slate-500">All operational</span></div>
+                        </div>
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="p-2.5 rounded-xl bg-purple-500/20 text-purple-400"><i class="fas fa-bolt text-lg"></i></div>
+                                <span class="flex items-center text-xs text-green-400 font-medium"><i class="fas fa-arrow-up mr-1"></i> 8%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-100 mb-1">98.9%</h3>
+                            <p class="text-sm text-slate-400">Uptime</p>
+                            <div class="mt-3 w-full bg-slate-700 rounded-full h-1.5"><div class="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full" style="width: 98.9%"></div></div>
+                        </div>
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400"><i class="fas fa-ticket-alt text-lg"></i></div>
+                                <span class="flex items-center text-xs text-red-400 font-medium"><i class="fas fa-arrow-up mr-1"></i> 3</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-100 mb-1">7</h3>
+                            <p class="text-sm text-slate-400">Open Tickets</p>
+                            <div class="mt-3 flex -space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-blue-500 border-2 border-slate-800 flex items-center justify-center text-xs text-white">2</div>
+                                <div class="w-6 h-6 rounded-full bg-amber-500 border-2 border-slate-800 flex items-center justify-center text-xs text-white">3</div>
+                                <div class="w-6 h-6 rounded-full bg-red-500 border-2 border-slate-800 flex items-center justify-center text-xs text-white">2</div>
+                            </div>
+                        </div>
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400"><i class="fas fa-users text-lg"></i></div>
+                                <span class="flex items-center text-xs text-green-400 font-medium"><i class="fas fa-arrow-up mr-1"></i> 24%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-100 mb-1">1,284</h3>
+                            <p class="text-sm text-slate-400">Active Users</p>
+                            <div class="mt-3 flex items-center gap-2 text-xs text-slate-500"><i class="fas fa-globe text-emerald-400"></i><span>45 countries</span></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="lg:col-span-2 glass-card rounded-2xl p-5">
+                            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                                <div><h3 class="text-lg font-semibold text-slate-100">Network Traffic</h3><p class="text-sm text-slate-400">Real-time monitoring</p></div>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-1 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">1H</button>
+                                    <button class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800/50 transition-colors">24H</button>
+                                    <button class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800/50 transition-colors">7D</button>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="trafficChart"></canvas></div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-5">
+                            <h3 class="text-lg font-semibold text-slate-100 mb-4">System Health</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative w-14 h-14">
+                                        <svg class="w-14 h-14 progress-ring"><circle cx="28" cy="28" r="24" stroke="#1e293b" stroke-width="3" fill="none"/><circle cx="28" cy="28" r="24" stroke="#3b82f6" stroke-width="3" fill="none" stroke-dasharray="150.8" stroke-dashoffset="30" stroke-linecap="round"/></svg>
+                                        <div class="absolute inset-0 flex items-center justify-center"><span class="text-xs font-bold text-slate-200">80%</span></div>
+                                    </div>
+                                    <div><p class="font-medium text-slate-200 text-sm">CPU Usage</p><p class="text-xs text-slate-400">16 cores</p></div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="relative w-14 h-14">
+                                        <svg class="w-14 h-14 progress-ring"><circle cx="28" cy="28" r="24" stroke="#1e293b" stroke-width="3" fill="none"/><circle cx="28" cy="28" r="24" stroke="#8b5cf6" stroke-width="3" fill="none" stroke-dasharray="150.8" stroke-dashoffset="60" stroke-linecap="round"/></svg>
+                                        <div class="absolute inset-0 flex items-center justify-center"><span class="text-xs font-bold text-slate-200">60%</span></div>
+                                    </div>
+                                    <div><p class="font-medium text-slate-200 text-sm">Memory</p><p class="text-xs text-slate-400">48GB / 64GB</p></div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="relative w-14 h-14">
+                                        <svg class="w-14 h-14 progress-ring"><circle cx="28" cy="28" r="24" stroke="#1e293b" stroke-width="3" fill="none"/><circle cx="28" cy="28" r="24" stroke="#10b981" stroke-width="3" fill="none" stroke-dasharray="150.8" stroke-dashoffset="105" stroke-linecap="round"/></svg>
+                                        <div class="absolute inset-0 flex items-center justify-center"><span class="text-xs font-bold text-slate-200">30%</span></div>
+                                    </div>
+                                    <div><p class="font-medium text-slate-200 text-sm">Disk I/O</p><p class="text-xs text-slate-400">Normal</p></div>
+                                </div>
+                            </div>
+                            <button class="w-full mt-4 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-sm text-slate-300 transition-colors border border-slate-700/50">View Report</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SERVERS TAB -->
+                <div id="servers" class="tab-content space-y-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div><h3 class="text-xl font-semibold text-slate-100">Server Management</h3><p class="text-sm text-slate-400">Manage all your infrastructure servers</p></div>
+                            <button class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all border border-blue-500/30 text-sm font-medium"><i class="fas fa-plus"></i><span>Add Server</span></button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="glass-card rounded-xl p-4 hover-lift cursor-pointer">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-server"></i></div>
+                                        <div><h4 class="font-semibold text-slate-200">WEB-01</h4><p class="text-xs text-slate-400">Production Web</p></div>
+                                    </div>
+                                    <span class="status-dot status-online"></span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs"><span class="text-slate-400">CPU</span><span class="text-slate-200">45%</span></div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 45%"></div></div>
+                                    <div class="flex justify-between text-xs"><span class="text-slate-400">Memory</span><span class="text-slate-200">62%</span></div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-purple-500 h-1.5 rounded-full" style="width: 62%"></div></div>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-slate-700/50 flex justify-between items-center"><span class="text-xs text-slate-500">IP: 192.168.1.101</span><button class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fas fa-ellipsis-v"></i></button></div>
+                            </div>
+                            <div class="glass-card rounded-xl p-4 hover-lift cursor-pointer">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400"><i class="fas fa-database"></i></div>
+                                        <div><h4 class="font-semibold text-slate-200">DB-03</h4><p class="text-xs text-slate-400">Primary Database</p></div>
+                                    </div>
+                                    <span class="status-dot status-warning"></span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs"><span class="text-slate-400">CPU</span><span class="text-amber-400">87%</span></div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-amber-500 h-1.5 rounded-full" style="width: 87%"></div></div>
+                                    <div class="flex justify-between text-xs"><span class="text-slate-400">Memory</span><span class="text-slate-200">74%</span></div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-purple-500 h-1.5 rounded-full" style="width: 74%"></div></div>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-slate-700/50 flex justify-between items-center"><span class="text-xs text-slate-500">IP: 192.168.1.103</span><button class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fas fa-ellipsis-v"></i></button></div>
+                            </div>
+                            <div class="glass-card rounded-xl p-4 hover-lift cursor-pointer">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400"><i class="fas fa-hdd"></i></div>
+                                        <div><h4 class="font-semibold text-slate-200">STORAGE-02</h4><p class="text-xs text-slate-400">File Storage</p></div>
+                                    </div>
+                                    <span class="status-dot status-online"></span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs"><span class="text-slate-400">CPU</span><span class="text-slate-200">32%</span></div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-emerald-500 h-1.5 rounded-full" style="width: 32%"></div></div>
+                                    <div class="flex justify-between text-xs"><span class="text-slate-400">Disk</span><span class="text-slate-200">68%</span></div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5"><div class="bg-cyan-500 h-1.5 rounded-full" style="width: 68%"></div></div>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-slate-700/50 flex justify-between items-center"><span class="text-xs text-slate-500">IP: 192.168.1.105</span><button class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fas fa-ellipsis-v"></i></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NETWORK TAB -->
+                <div id="network" class="tab-content space-y-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4">Network Overview</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="chart-container" style="height: 300px;"><canvas id="networkChart"></canvas></div>
+                            <div class="space-y-4">
+                                <div class="glass-card rounded-xl p-4">
+                                    <h4 class="font-semibold text-slate-200 mb-3">Bandwidth Usage</h4>
+                                    <div class="space-y-3">
+                                        <div><div class="flex justify-between text-sm mb-1"><span class="text-slate-400">Inbound</span><span class="text-blue-400">850 Mbps</span></div><div class="w-full bg-slate-700 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div></div></div>
+                                        <div><div class="flex justify-between text-sm mb-1"><span class="text-slate-400">Outbound</span><span class="text-purple-400">620 Mbps</span></div><div class="w-full bg-slate-700 rounded-full h-2"><div class="bg-purple-500 h-2 rounded-full" style="width: 48%"></div></div></div>
+                                    </div>
+                                </div>
+                                <div class="glass-card rounded-xl p-4">
+                                    <h4 class="font-semibold text-slate-200 mb-3">Network Devices</h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="text-center p-3 rounded-lg bg-slate-800/50"><i class="fas fa-router text-2xl text-blue-400 mb-2"></i><p class="text-sm text-slate-300">Routers</p><p class="text-lg font-bold text-slate-100">8</p></div>
+                                        <div class="text-center p-3 rounded-lg bg-slate-800/50"><i class="fas fa-network-wired text-2xl text-purple-400 mb-2"></i><p class="text-sm text-slate-300">Switches</p><p class="text-lg font-bold text-slate-100">12</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECURITY TAB -->
+                <div id="security" class="tab-content space-y-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div><h3 class="text-xl font-semibold text-slate-100">Security Center</h3><p class="text-sm text-slate-400">Monitor threats and security events</p></div>
+                            <div class="flex gap-2"><span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-sm font-medium">3 Active Alerts</span></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="glass-card rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 mx-auto mb-3"><i class="fas fa-shield-alt text-xl"></i></div><h4 class="text-2xl font-bold text-slate-100">99.8%</h4><p class="text-sm text-slate-400">Security Score</p></div>
+                            <div class="glass-card rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-3"><i class="fas fa-ban text-xl"></i></div><h4 class="text-2xl font-bold text-slate-100">1,247</h4><p class="text-sm text-slate-400">Threats Blocked</p></div>
+                            <div class="glass-card rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 mx-auto mb-3"><i class="fas fa-exclamation-triangle text-xl"></i></div><h4 class="text-2xl font-bold text-slate-100">3</h4><p class="text-sm text-slate-400">Active Alerts</p></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+                                <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0"><i class="fas fa-exclamation"></i></div>
+                                <div class="flex-1 min-w-0"><p class="font-medium text-slate-200">Brute Force Attack Detected</p><p class="text-sm text-slate-400">IP: 192.168.1.245 • 5 minutes ago</p></div>
+                                <button class="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 text-sm hover:bg-red-500/30 transition-colors">Block</button>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                                <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0"><i class="fas fa-key"></i></div>
+                                <div class="flex-1 min-w-0"><p class="font-medium text-slate-200">Weak Password Detected</p><p class="text-sm text-slate-400">User: john.doe • 1 hour ago</p></div>
+                                <button class="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 text-sm hover:bg-amber-500/30 transition-colors">Notify</button>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                                <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fas fa-download"></i></div>
+                                <div class="flex-1 min-w-0"><p class="font-medium text-slate-200">Unusual Download Activity</p><p class="text-sm text-slate-400">Server: WEB-01 • 2 hours ago</p></div>
+                                <button class="px-3 py-1 rounded-lg bg-blue-500/20 text-blue-400 text-sm hover:bg-blue-500/30 transition-colors">Review</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USERS TAB -->
+                <div id="users" class="tab-content space-y-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div><h3 class="text-xl font-semibold text-slate-100">User Management</h3><p class="text-sm text-slate-400">Manage system users and permissions</p></div>
+                            <button class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all border border-blue-500/30 text-sm font-medium"><i class="fas fa-user-plus"></i><span>Add User</span></button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="custom-table">
+                                <thead><tr class="text-slate-500 text-sm"><th>User</th><th>Role</th><th>Status</th><th>Last Active</th><th>Actions</th></tr></thead>
+                                <tbody class="text-sm">
+                                    <tr>
+                                        <td class="py-3"><div class="flex items-center gap-3"><img src="https://ui-avatars.com/api/?name=Alex+Morgan&background=3b82f6&color=fff" class="w-8 h-8 rounded-full"><div><p class="font-medium text-slate-200">Alex Morgan</p><p class="text-xs text-slate-400">alex@nexusit.com</p></div></div></td>
+                                        <td><span class="px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs">Admin</span></td>
+                                        <td><span class="flex items-center gap-1.5"><span class="status-dot status-online"></span><span class="text-slate-300">Active</span></span></td>
+                                        <td class="text-slate-400">Now</td>
+                                        <td><button class="text-slate-400 hover:text-blue-400"><i class="fas fa-ellipsis-h"></i></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3"><div class="flex items-center gap-3"><img src="https://ui-avatars.com/api/?name=Sarah+Chen&background=10b981&color=fff" class="w-8 h-8 rounded-full"><div><p class="font-medium text-slate-200">Sarah Chen</p><p class="text-xs text-slate-400">sarah@nexusit.com</p></div></div></td>
+                                        <td><span class="px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs">Developer</span></td>
+                                        <td><span class="flex items-center gap-1.5"><span class="status-dot status-online"></span><span class="text-slate-300">Active</span></span></td>
+                                        <td class="text-slate-400">5 min ago</td>
+                                        <td><button class="text-slate-400 hover:text-blue-400"><i class="fas fa-ellipsis-h"></i></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3"><div class="flex items-center gap-3"><img src="https://ui-avatars.com/api/?name=Mike+Johnson&background=f59e0b&color=fff" class="w-8 h-8 rounded-full"><div><p class="font-medium text-slate-200">Mike Johnson</p><p class="text-xs text-slate-400">mike@nexusit.com</p></div></div></td>
+                                        <td><span class="px-2 py-1 rounded-full bg-slate-700 text-slate-300 text-xs">Viewer</span></td>
+                                        <td><span class="flex items-center gap-1.5"><span class="status-dot status-offline"></span><span class="text-slate-400">Offline</span></span></td>
+                                        <td class="text-slate-400">2 hours ago</td>
+                                        <td><button class="text-slate-400 hover:text-blue-400"><i class="fas fa-ellipsis-h"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS TAB -->
+               
+
+                <!-- SETTINGS TAB -->
+                <div id="settings" class="tab-content space-y-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-6">System Settings</h3>
+                        <div class="space-y-6 max-w-2xl">
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                                <div><p class="font-medium text-slate-200">Email Notifications</p><p class="text-sm text-slate-400">Receive alerts via email</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                                <div><p class="font-medium text-slate-200">Auto Backup</p><p class="text-sm text-slate-400">Daily automatic backups</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                                <div><p class="font-medium text-slate-200">Dark Mode</p><p class="text-sm text-slate-400">Always use dark theme</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                                <div><p class="font-medium text-slate-200">Two-Factor Auth</p><p class="text-sm text-slate-400">Require 2FA for all users</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-6 border-t border-slate-700/50 flex gap-3">
+                            <button class="px-6 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors">Save Changes</button>
+                            <button class="px-6 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-300 font-medium transition-colors border border-slate-700/50">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('text-slate-400');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            const selectedNav = document.querySelector(`[data-tab="${tabName}"]`);
+            selectedNav.classList.add('active');
+            selectedNav.classList.remove('text-slate-400');
+
+            updateHeaderTitle(tabName);
+
+            if (window.innerWidth < 1024) toggleSidebar();
+
+            if (tabName === 'network' && !window.networkChart) initNetworkChart();
+            if (tabName === 'analytics' && !window.analyticsChart1) initAnalyticsCharts();
+        }
+
+        function updateHeaderTitle(tabName) {
+            const titles = {
+                'dashboard': { title: 'Dashboard Overview', subtitle: 'Welcome back, Alex' },
+                'servers': { title: 'Server Management', subtitle: 'Manage your infrastructure' },
+                'network': { title: 'Network Monitor', subtitle: 'Real-time network analytics' },
+                'security': { title: 'Security Center', subtitle: 'Threats and protection status' },
+                'users': { title: 'User Management', subtitle: 'Manage system users' },
+                'analytics': { title: 'Performance Analytics', subtitle: 'System performance metrics' },
+                'settings': { title: 'System Settings', subtitle: 'Configure your dashboard' }
+            };
+            const data = titles[tabName];
+            document.getElementById('header-title').innerHTML = `<h2 class="text-lg font-semibold text-slate-100 page-title">${data.title}</h2><p class="text-sm text-slate-400">${data.subtitle}</p>`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        // Dashboard Chart
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient1.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+        gradient1.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient2.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
+        gradient2.addColorStop(1, 'rgba(139, 92, 246, 0)');
+
+        const trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Now'],
+                datasets: [{
+                    label: 'Inbound',
+                    data: [45, 52, 78, 125, 145, 132, 128],
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradient1,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5
+                }, {
+                    label: 'Outbound',
+                    data: [38, 45, 65, 98, 115, 108, 105],
+                    borderColor: '#8b5cf6',
+                    backgroundColor: gradient2,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: true, position: 'top', align: 'end', labels: { color: '#94a3b8', usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
+                    tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#f1f5f9', bodyColor: '#cbd5e1', borderColor: 'rgba(59, 130, 246, 0.3)', borderWidth: 1, padding: 10, callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} Mbps` } }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(148, 163, 184, 0.1)', drawBorder: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                    y: { grid: { color: 'rgba(148, 163, 184, 0.1)', drawBorder: false }, ticks: { color: '#64748b', font: { size: 10 }, callback: (val) => val + ' Mbps' } }
+                }
+            }
+        });
+
+        setInterval(() => {
+            trafficChart.data.datasets[0].data = trafficChart.data.datasets[0].data.map(val => Math.max(20, Math.min(150, val + (Math.random() - 0.5) * 8)));
+            trafficChart.data.datasets[1].data = trafficChart.data.datasets[1].data.map(val => Math.max(20, Math.min(150, val + (Math.random() - 0.5) * 8)));
+            trafficChart.update('none');
+        }, 3000);
+
+        function initNetworkChart() {
+            const netCtx = document.getElementById('networkChart').getContext('2d');
+            window.networkChart = new Chart(netCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Router-1', 'Router-2', 'Switch-1', 'Switch-2', 'Firewall', 'Load Balancer'],
+                    datasets: [{
+                        label: 'Traffic (GB)',
+                        data: [450, 380, 520, 410, 290, 340],
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function initAnalyticsCharts() {
+            const ctx1 = document.getElementById('analyticsChart1').getContext('2d');
+            window.analyticsChart1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['200 OK', '404 Error', '500 Error', '301 Redirect'],
+                    datasets: [{
+                        data: [85, 8, 2, 5],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } } }
+                }
+            });
+
+            const ctx2 = document.getElementById('analyticsChart2').getContext('2d');
+            window.analyticsChart2 = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Requests',
+                        data: [850, 920, 880, 950, 1020, 780, 820],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('overlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+</body>
+</html>
